@@ -2,61 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Quantum Merge – Idle Strategy Game</title>
-  <meta name="description" content="Merge quantum particles, unlock exponential energy, and evolve through the quantum realms. A strategy-skill game of progression and power.">
+  <title>Quantum Merge – Exponential Merge Game</title>
+  <meta name="description" content="Merge quantum tiles like Quark Spark and Gluon Nova to create exponential energy in this idle merge-strategy game by StaticQuasar931.">
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(ellipse at center, #10141a 0%, #000000 100%);
-      color: white;
+      background: radial-gradient(ellipse at center, #11121b 0%, #000000 100%);
       font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
+      color: white;
       height: 100%;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    h1 {
-      margin: 10px;
-    }
-    #score {
-      margin: 10px;
-      font-size: 18px;
-    }
+    h1 { margin: 10px; font-size: 32px; }
+    #score { margin: 8px; font-size: 18px; }
     #grid {
       display: grid;
-      grid-template-columns: repeat(5, 80px);
-      grid-template-rows: repeat(5, 80px);
-      gap: 8px;
-      margin: 20px;
+      grid-template-columns: repeat(5, 90px);
+      grid-template-rows: repeat(5, 90px);
+      gap: 6px;
+      margin: 10px;
     }
     .cell {
       background: #1f1f2e;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 12px;
+      text-align: center;
       border-radius: 10px;
       cursor: pointer;
       border: 2px solid #00f0ff66;
       transition: transform 0.1s;
+      padding: 6px;
+      user-select: none;
     }
-    .cell:hover {
-      transform: scale(1.05);
-    }
-    .highlight {
-      border-color: #ffffff;
-    }
+    .cell:hover { transform: scale(1.05); }
+    .highlight { border-color: #ffffff; }
     button {
       background: #00f0ff;
       color: black;
-      padding: 8px 16px;
+      padding: 8px 14px;
       border: none;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 10px;
+      margin: 4px;
     }
   </style>
 </head>
@@ -64,37 +58,48 @@
   <h1>Quantum Merge</h1>
   <div id="score">Energy: 0</div>
   <div id="grid"></div>
-  <button onclick="resetGame()">Reset</button>
+  <div>
+    <button onclick="resetGame()">Reset</button>
+    <button onclick="addRandomTile()">+ Quantum Drop</button>
+  </div>
 
   <script>
+    const quantumNames = [
+      'Quark Spark', 'Muon Echo', 'Boson Core', 'Boson Flux', 'Graviton Core',
+      'Quark Singularity', 'Photon Spark', 'Photon Nova', 'Photon Pulse', 'Higgs Echo',
+      'Neutrino Spark', 'Quark Flux', 'Quark Core', 'Photon Loop', 'Gluon Spark',
+      'Higgs Loop', 'Photon', 'Higgs Pulse', 'Muon Wave', 'Gluon',
+      'Tachyon Echo', 'Gluon Loop', 'Neutrino Nova', 'Boson Spark', 'Singularity Wave',
+      'Tachyon Core', 'Graviton Spark', 'Neutrino Echo', 'Photon Core', 'Quark Wave',
+      'Higgs Nova', 'Tachyon Singularity', 'Quantum Mind', 'Entropy Lock', 'Chaos Pulse',
+      'Time Core', 'Nova Brain', 'Echo Star', 'Gluon Burst', 'Darklight Node'
+    ];
+
     const gridSize = 5;
-    const grid = document.getElementById('grid');
-    const scoreDisplay = document.getElementById('score');
     let cells = [];
     let score = 0;
     let selected = null;
 
-    function getSaveData() {
-      return JSON.parse(localStorage.getItem('quantumMergeData') || 'null');
-    }
-
-    function saveData() {
-      localStorage.setItem('quantumMergeData', JSON.stringify({ cells, score }));
-    }
+    const grid = document.getElementById('grid');
+    const scoreDisplay = document.getElementById('score');
 
     function resetGame() {
-      if (!confirm("Reset everything?")) return;
-      cells = Array(gridSize * gridSize).fill(0).map(() => Math.random() < 0.2 ? 1 : 0);
+      if (!confirm("Reset all progress?")) return;
+      cells = Array(gridSize * gridSize).fill(0);
       score = 0;
-      saveData();
+      saveGame();
       render();
     }
 
+    function saveGame() {
+      localStorage.setItem('qm_data', JSON.stringify({ score, cells }));
+    }
+
     function loadGame() {
-      const saved = getSaveData();
-      if (saved) {
-        cells = saved.cells;
-        score = saved.score;
+      const save = JSON.parse(localStorage.getItem('qm_data') || 'null');
+      if (save) {
+        score = save.score;
+        cells = save.cells;
       } else {
         resetGame();
       }
@@ -103,14 +108,16 @@
 
     function render() {
       grid.innerHTML = '';
-      cells.forEach((value, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        if (selected === i) cell.classList.add('highlight');
-        cell.textContent = value > 0 ? `Q${value}` : '';
-        cell.style.background = value > 0 ? `hsl(${(value * 40) % 360}, 70%, 50%)` : '#1f1f2e';
-        cell.onclick = () => handleClick(i);
-        grid.appendChild(cell);
+      cells.forEach((val, i) => {
+        const tile = document.createElement('div');
+        tile.className = 'cell';
+        if (val > 0) {
+          tile.textContent = quantumNames[val - 1] || `Q${val}`;
+          tile.style.background = `hsl(${(val * 45) % 360}, 70%, 50%)`;
+        }
+        if (selected === i) tile.classList.add('highlight');
+        tile.onclick = () => handleClick(i);
+        grid.appendChild(tile);
       });
       scoreDisplay.textContent = `Energy: ${score.toLocaleString()}`;
     }
@@ -123,16 +130,29 @@
       } else {
         if (cells[i] === cells[selected] && cells[i] !== 0) {
           cells[i]++;
-          score += Math.pow(2, cells[i]);
+          score += Math.floor(Math.pow(2, cells[i]) * (1 + cells[i] / 10));
           cells[selected] = 0;
           selected = null;
-          saveData();
+          saveGame();
         } else {
           selected = null;
         }
       }
       render();
     }
+
+    function addRandomTile() {
+      const empty = cells.map((v, i) => v === 0 ? i : -1).filter(i => i !== -1);
+      if (empty.length === 0) return;
+      const idx = empty[Math.floor(Math.random() * empty.length)];
+      cells[idx] = 1;
+      render();
+      saveGame();
+    }
+
+    setInterval(() => {
+      if (Math.random() < 0.7) addRandomTile();
+    }, 5000);
 
     loadGame();
   </script>
