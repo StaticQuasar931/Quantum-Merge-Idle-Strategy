@@ -2,23 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Quantum Merge – Exponential Merge Game</title>
-  <meta name="description" content="Merge quantum tiles like Quark Spark and Gluon Nova to create exponential energy in this idle merge-strategy game by StaticQuasar931.">
+  <title>Quantum Merge – Idle Merge Strategy Game</title>
+  <meta name="description" content="Merge particles like Quark Nova and Higgs Core to create exponential energy and income. A school-safe, unblocked idle strategy game by StaticQuasar931.">
+  <meta name="keywords" content="quantum merge, idle merge game, exponential game, unblocked idle game, school merge game, staticquasar931 games, g@mes, merge strategy, clicker, incremental, idle g@me">
+  <link rel="canonical" href="https://sites.google.com/view/staticquasar931/gm3z/quantum-merge">
+
+  <!-- Preload Rotating Icons -->
+  <link rel="preload" as="image" href="https://res.cloudinary.com/dcsrqennd/image/upload/v1747533056/raw_um4pvq.png">
+  <link rel="preload" as="image" href="https://res.cloudinary.com/dcsrqennd/image/upload/v1747533158/raw_cw34yi.png">
+
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(ellipse at center, #11121b 0%, #000000 100%);
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: radial-gradient(#111 0%, #000 100%);
       font-family: 'Segoe UI', sans-serif;
       color: white;
-      height: 100%;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     h1 { margin: 10px; font-size: 32px; }
-    #score { margin: 8px; font-size: 18px; }
+
+    #score {
+      margin: 5px;
+      font-size: 16px;
+    }
+
     #grid {
       display: grid;
       grid-template-columns: repeat(5, 90px);
@@ -26,8 +40,10 @@
       gap: 6px;
       margin: 10px;
     }
+
     .cell {
       background: #1f1f2e;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -40,8 +56,10 @@
       padding: 6px;
       user-select: none;
     }
+
     .cell:hover { transform: scale(1.05); }
-    .highlight { border-color: #ffffff; }
+    .highlight { border-color: #fff; }
+
     button {
       background: #00f0ff;
       color: black;
@@ -50,20 +68,90 @@
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      margin: 4px;
+      margin: 6px 4px;
+    }
+
+    #staticSlideMenu {
+      position: fixed;
+      bottom: 120px;
+      right: -150px;
+      width: 100px;
+      height: 100px;
+      z-index: 9999;
+      transition: right 1.2s ease-in-out;
+    }
+
+    #staticSlideMenu.show {
+      right: 20px;
+    }
+
+    #staticSlideMenu img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: pulse 2.8s ease-in-out infinite;
+      border-radius: 50%;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    #staticMenu {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 18px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00ffea;
+      animation: flicker 2s infinite;
+    }
+
+    #closeStaticMenu {
+      margin-left: 10px;
+      background: red;
+      color: white;
+      border-radius: 8px;
+      padding: 2px 6px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
   </style>
 </head>
 <body>
   <h1>Quantum Merge</h1>
-  <div id="score">Energy: 0</div>
+  <div id="score">Energy: 0 | Coins: 0</div>
   <div id="grid"></div>
   <div>
+    <button onclick="buyTile()">Buy Tile (W)</button>
+    <button onclick="mergeAll()">Merge All (Space)</button>
     <button onclick="resetGame()">Reset</button>
-    <button onclick="addRandomTile()">+ Quantum Drop</button>
   </div>
 
+  <!-- Static Menu -->
+  <div id="staticMenu">
+    More Unblocked Games by Static
+    <span id="closeStaticMenu">✕</span>
+  </div>
+
+  <!-- Slide Menu -->
+  <a id="staticSlideMenu" href="#" target="_blank">
+    <img src="" alt="Static Menu Icon">
+  </a>
+
   <script>
+    const gridSize = 5;
     const quantumNames = [
       'Quark Spark', 'Muon Echo', 'Boson Core', 'Boson Flux', 'Graviton Core',
       'Quark Singularity', 'Photon Spark', 'Photon Nova', 'Photon Pulse', 'Higgs Echo',
@@ -75,65 +163,42 @@
       'Time Core', 'Nova Brain', 'Echo Star', 'Gluon Burst', 'Darklight Node'
     ];
 
-    const gridSize = 5;
-    let cells = [];
+    let cells = Array(gridSize * gridSize).fill(0);
     let score = 0;
+    let coins = 0;
     let selected = null;
+    let tick = 0;
 
     const grid = document.getElementById('grid');
     const scoreDisplay = document.getElementById('score');
 
-    function resetGame() {
-      if (!confirm("Reset all progress?")) return;
-      cells = Array(gridSize * gridSize).fill(0);
-      score = 0;
-      saveGame();
-      render();
-    }
-
-    function saveGame() {
-      localStorage.setItem('qm_data', JSON.stringify({ score, cells }));
-    }
-
-    function loadGame() {
-      const save = JSON.parse(localStorage.getItem('qm_data') || 'null');
-      if (save) {
-        score = save.score;
-        cells = save.cells;
-      } else {
-        resetGame();
-      }
-      render();
-    }
-
     function render() {
       grid.innerHTML = '';
       cells.forEach((val, i) => {
-        const tile = document.createElement('div');
-        tile.className = 'cell';
+        const cell = document.createElement('div');
+        cell.className = 'cell';
         if (val > 0) {
-          tile.textContent = quantumNames[val - 1] || `Q${val}`;
-          tile.style.background = `hsl(${(val * 45) % 360}, 70%, 50%)`;
+          cell.textContent = quantumNames[val - 1] || `Q${val}`;
+          cell.style.background = `hsl(${(val * 45) % 360}, 70%, 50%)`;
         }
-        if (selected === i) tile.classList.add('highlight');
-        tile.onclick = () => handleClick(i);
-        grid.appendChild(tile);
+        if (selected === i) cell.classList.add('highlight');
+        cell.onclick = () => handleClick(i);
+        grid.appendChild(cell);
       });
-      scoreDisplay.textContent = `Energy: ${score.toLocaleString()}`;
+      scoreDisplay.textContent = `Energy: ${score.toLocaleString()} | Coins: ${coins.toLocaleString()}`;
     }
 
     function handleClick(i) {
-      if (selected === null) {
-        if (cells[i] > 0) selected = i;
+      if (selected === null && cells[i] > 0) {
+        selected = i;
       } else if (selected === i) {
         selected = null;
       } else {
         if (cells[i] === cells[selected] && cells[i] !== 0) {
           cells[i]++;
-          score += Math.floor(Math.pow(2, cells[i]) * (1 + cells[i] / 10));
+          score += Math.pow(2, cells[i]);
           cells[selected] = 0;
           selected = null;
-          saveGame();
         } else {
           selected = null;
         }
@@ -141,18 +206,109 @@
       render();
     }
 
-    function addRandomTile() {
+    function mergeAll() {
+      let merged = false;
+      for (let i = 0; i < cells.length; i++) {
+        for (let j = 0; j < cells.length; j++) {
+          if (i !== j && cells[i] === cells[j] && cells[i] > 0) {
+            cells[i]++;
+            score += Math.pow(2, cells[i]);
+            cells[j] = 0;
+            merged = true;
+            break;
+          }
+        }
+      }
+      if (merged) render();
+    }
+
+    function buyTile() {
+      const cost = Math.floor(10 * Math.pow(1.15, tick));
+      if (coins < cost) return;
       const empty = cells.map((v, i) => v === 0 ? i : -1).filter(i => i !== -1);
       if (empty.length === 0) return;
       const idx = empty[Math.floor(Math.random() * empty.length)];
       cells[idx] = 1;
+      coins -= cost;
+      tick++;
       render();
-      saveGame();
     }
 
-    setInterval(() => {
-      if (Math.random() < 0.7) addRandomTile();
-    }, 5000);
+    function incomeLoop() {
+      cells.forEach(val => {
+        if (val > 0) {
+          coins += Math.floor(Math.pow(3, val - 1));
+        }
+      });
+      render();
+      localStorage.setItem("qm_save", JSON.stringify({ cells, score, coins, tick }));
+    }
+
+    function resetGame() {
+      if (!confirm("Are you sure you want to reset?")) return;
+      cells = Array(gridSize * gridSize).fill(0);
+      score = 0;
+      coins = 0;
+      tick = 0;
+      render();
+    }
+
+    function loadGame() {
+      const save = JSON.parse(localStorage.getItem("qm_save") || "null");
+      if (save) {
+        cells = save.cells;
+        score = save.score;
+        coins = save.coins;
+        tick = save.tick || 0;
+      }
+      render();
+    }
+
+    // Income every second
+    setInterval(incomeLoop, 1000);
+
+    // Keyboard controls
+    document.addEventListener("keydown", e => {
+      if (e.code === "Space") mergeAll();
+      if (e.code === "KeyW") buyTile();
+    });
+
+    // Static Slide Menu Script
+    const menu = document.getElementById("staticMenu");
+    const closeBtn = document.getElementById("closeStaticMenu");
+    closeBtn.onclick = () => {
+      menu.style.display = "none";
+      setTimeout(() => {
+        menu.style.display = "block";
+      }, 180000);
+    };
+
+    const slideMenu = document.getElementById("staticSlideMenu");
+    const formImg = "https://res.cloudinary.com/dcsrqennd/image/upload/v1747533056/raw_um4pvq.png";
+    const instaImg = "https://res.cloudinary.com/dcsrqennd/image/upload/v1747533158/raw_cw34yi.png";
+    const formLink = "https://sites.google.com/view/staticquasar931/google-form";
+    const instaLink = "https://www.instagram.com/freeschoolgamepage/";
+    let showForm = true;
+
+    function toggleSlide() {
+      if (showForm) {
+        slideMenu.href = formLink;
+        slideMenu.querySelector("img").src = formImg;
+        slideMenu.querySelector("img").alt = "Google Form";
+      } else {
+        slideMenu.href = instaLink;
+        slideMenu.querySelector("img").src = instaImg;
+        slideMenu.querySelector("img").alt = "Instagram";
+      }
+      showForm = !showForm;
+      slideMenu.classList.add("show");
+      setTimeout(() => {
+        slideMenu.classList.remove("show");
+      }, 10000);
+    }
+
+    toggleSlide();
+    setInterval(toggleSlide, 25000);
 
     loadGame();
   </script>
