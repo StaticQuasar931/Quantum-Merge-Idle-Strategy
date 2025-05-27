@@ -3,24 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <title>Quantum Merge Ultimate+++</title>
-  <meta name="description" content="Play Quantum Merge Ultimate+++: a satisfying, idle/active merge game with upgrades, automation, anti-stuck logic, and prestige. Chromebook optimized." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Idle merge strategy game with upgrades, prestige, real balance, and Chromebook support." />
   <style>
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --accent: #00f0ff;
+      --cell-bg: #1f1f2e;
+      --upgrade-bg: #222;
+      --prestige-bg: #440044;
+    }
+    [data-theme="light"] {
+      --bg: #f4f4f4;
+      --text: #111;
+      --accent: #007acc;
+      --cell-bg: #fff;
+      --upgrade-bg: #ddd;
+      --prestige-bg: #ffeeff;
+    }
+    [data-theme="sunset"] {
+      --bg: #2b1a1a;
+      --text: #ffe4c4;
+      --accent: #ff944d;
+      --cell-bg: #442e2e;
+      --upgrade-bg: #3a2a2a;
+      --prestige-bg: #7a3333;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
-      background: #000;
-      color: white;
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
     }
 
-    h1 { font-size: 28px; margin: 8px 0; text-align: center; }
+    h1 {
+      margin: 8px 0;
+      font-size: 26px;
+      text-align: center;
+    }
 
-    #stats {
+    #stats, #prestige {
       font-size: 14px;
       margin: 4px;
       text-align: center;
@@ -36,8 +65,8 @@
     }
 
     .cell {
-      background: #1f1f2e;
-      color: white;
+      background: var(--cell-bg);
+      color: var(--text);
       border-radius: 6px;
       height: 70px;
       display: flex;
@@ -45,20 +74,13 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      border: 2px solid #00f0ff33;
       font-size: 11px;
-    }
-
-    .cell div {
-      max-width: 95%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      border: 2px solid var(--accent);
     }
 
     button {
-      background: #00f0ff;
-      color: black;
+      background: var(--accent);
+      color: var(--bg);
       font-weight: bold;
       border: none;
       border-radius: 6px;
@@ -72,270 +94,443 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
-      margin: 10px auto;
-      max-width: 600px;
+      max-width: 1000px;
     }
 
     .upgrade {
-      background: #222;
-      border: 1px solid #00f0ff;
+      background: var(--upgrade-bg);
+      border: 1px solid var(--accent);
       border-radius: 6px;
       padding: 6px;
       min-width: 130px;
       text-align: center;
       font-size: 12px;
+      position: relative;
+    }
+
+    .upgrade::before {
+      content: attr(data-key);
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 10px;
+      padding: 1px 4px;
+      border-radius: 4px;
     }
 
     .prestige {
-      background: #440044;
+      background: var(--prestige-bg);
       border: 2px solid #ff00ff;
       color: #ffbbff;
     }
 
-    .highlight {
-      animation: pulse 0.6s ease-in-out;
+    #helpBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); background-color: #0ff; color: black; }
-      50% { transform: scale(1.05); background-color: #2ff; }
-      100% { transform: scale(1); }
+    #helpModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 99;
+    }
+
+    #helpContent {
+      background: var(--upgrade-bg);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 20px;
+      color: var(--text);
+      max-width: 400px;
+      font-size: 13px;
+    }
+
+    #confirmModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    #confirmBox {
+      background: var(--bg);
+      color: var(--text);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    label, select {
+      display: block;
+      margin-top: 10px;
+    }
+
+    select {
+      padding: 4px;
+      border-radius: 4px;
     }
   </style>
 </head>
-<body>
+<body data-theme="dark">
   <h1>Quantum Merge Ultimate+++</h1>
-  <div id="stats">Loading...</div>
+  <div id="stats"></div>
+  <div id="prestige"></div>
   <div id="grid"></div>
 
   <div>
-    <button onclick="buyTile()">Buy Tile (W) <span id="buyCost"></span></button>
-    <button onclick="mergeAll()">Merge All (Space)</button>
+    <button onclick="buyTile()">Buy Tile (W) <span id="buyCostText"></span></button>
+    <button onclick="mergeAll()">Merge All (S)</button>
   </div>
 
-  <div class="upgrade-box" id="upgrades">
-    <div class="upgrade" id="autoMergePanel">
+  <div class="upgrade-box">
+    <div class="upgrade" data-key="1">
       <b>Auto Merge</b><br>
       Speed: <span id="mergeSpeed">OFF</span><br>
       Cost: <span id="mergeCost">$1000</span><br>
       <button onclick="upgradeMerge()">Upgrade</button>
     </div>
-    <div class="upgrade" id="autoBuyPanel">
+    <div class="upgrade" data-key="2">
       <b>Auto Buy</b><br>
       Speed: <span id="buySpeed">OFF</span><br>
       Cost: <span id="buyCost">$750</span><br>
       <button onclick="upgradeBuy()">Upgrade</button>
     </div>
-    <div class="upgrade" id="multiBuyPanel">
+    <div class="upgrade" data-key="3">
       <b>Multi Buy</b><br>
-      Current: <span id="multiBuyDisplay">x1</span><br>
-      Cost: <span id="multiBuyCost">$500</span><br>
-      <button onclick="unlockMultiBuy()">Unlock / Toggle</button>
+      Mode: <span id="multiMode">x1</span><br>
+      Cost: <span id="multiCost">$500</span><br>
+      <button onclick="toggleMultiBuy()">Buy/Toggle</button>
     </div>
-    <div class="upgrade" id="incomeBoostPanel">
-      <b>Income Multiplier</b><br>
-      Current: <span id="incomeMultiplier">1.00x</span><br>
+    <div class="upgrade" data-key="4">
+      <b>Income Boost</b><br>
+      Boost: <span id="boostLevel">1.00x</span><br>
       Cost: <span id="boostCost">$2000</span><br>
       <button onclick="upgradeBoost()">Upgrade</button>
     </div>
-    <div class="upgrade prestige" id="prestigePanel" style="display:none;">
+    <div class="upgrade prestige" data-key="5" id="prestigePanel" style="display:none;">
       <b>PRESTIGE</b><br>
-      Prestige Points: <span id="pp">0</span><br>
-      <button onclick="doPrestige()">Prestige Now</button>
+      Points: <span id="pp">0</span><br>
+      <button onclick="confirmPrestige()">Prestige</button>
+    </div>
+  </div>
+
+  <button id="helpBtn" onclick="document.getElementById('helpModal').style.display='flex'">Help / Settings</button>
+
+  <div id="helpModal" onclick="if(event.target.id==='helpModal'){this.style.display='none'}">
+    <div id="helpContent">
+      <b>Help / Settings</b><br><br>
+      - Buy: W / ↑ / Enter<br>
+      - Merge: S / ↓ / Space<br>
+      - Upgrade: 1–5<br>
+      - Prestige at Lv50+<br><br>
+      <label><input type="checkbox" id="flashToggle"> Enable Tile Flash</label>
+      <label><input type="checkbox" id="confirmToggle" checked> Confirm Prestige/Reset</label>
+      <label>Theme:
+        <select id="themeSelect" onchange="setTheme(this.value)">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="sunset">Sunset</option>
+        </select>
+      </label>
+      <br>
+      <button onclick="confirmReset()">Reset Game</button>
+    </div>
+  </div>
+
+  <div id="confirmModal">
+    <div id="confirmBox">
+      <div id="confirmText">Are you sure?</div>
+      <button onclick="doConfirmedAction(true)">Yes</button>
+      <button onclick="doConfirmedAction(false)">No</button>
     </div>
   </div>
 
 <script>
-window.onbeforeunload = function() {
-  return "Are you sure you want to leave? Your progress will be lost unless it's saved.";
-};
+window.onbeforeunload = () => "Leaving may cause unsaved progress.";
 
-const format = n => {
-  if (n < 1e3) return n.toLocaleString();
+const E = id => document.getElementById(id);
+const bigFormat = n => {
   const units = ["K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];
-  let u = Math.floor(Math.log10(n) / 3) - 1;
-  return (n / Math.pow(1e3, u + 1)).toFixed(2) + units[u];
+  let exp = Math.floor(Math.log10(n) / 3);
+  if (exp <= 0) return n.toLocaleString();
+  if (exp >= units.length) return n.toExponential(3);
+  return (n / Math.pow(1e3, exp)).toFixed(2) + units[exp - 1];
 };
 
-const names = (() => {
-  const bases = ["Quark", "Muon", "Boson", "Photon", "Neutrino", "Gluon", "Tachyon", "Higgs", "Graviton", "Lepton"];
-  const suffixes = ["Spark", "Echo", "Core", "Loop", "Nova", "Pulse", "Wave", "Singularity", "Matrix", "Drive"];
-  const list = [];
-  for (let i = 0; i < 15; i++) for (let j = 0; j < 10; j++) list.push(`${bases[j]} ${suffixes[i]}`);
-  return list;
-})();
+let state = JSON.parse(localStorage.getItem("qmSave") || "{}");
+state.cells ??= Array(25).fill(0);
+state.coins ??= 100;
+state.prestige ??= 0;
+state.prestigePoints ??= 0;
+state.levelBuys ??= {};
+state.buyLevel ??= 1;
+state.autoMergeLevel ??= 0;
+state.autoBuyLevel ??= 0;
+state.boostLevel ??= 0;
+state.multiBuy ??= 1;
+state.multiBuyState ??= "x1";
+state.flash ??= false;
+state.theme ??= "dark";
+state.confirm ??= true;
+state.prestigeBonus ??= 0;
 
-let gridSize = 5;
-let cells = Array(gridSize * gridSize).fill(0);
-let coins = 100;
-let score = 0;
-let tick = 0;
-let buyLevel = 1;
-let buyCount = 0;
-let levelBuys = {};
+let actionQueue = "";
+let autoMergeTimer, autoBuyTimer;
 let autoMergeSpeed = null, autoBuySpeed = null;
-let autoMergeLevel = 0, autoBuyLevel = 0;
-let autoMergeTimer = null, autoBuyTimer = null;
-let multiBuyUnlocked = false, multiBuy = 1;
-let incomeBoost = 1, boostCount = 0;
-let prestigePoints = 0;
 
-function render() {
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-  cells.forEach((v, i) => {
-    const div = document.createElement("div");
-    div.className = "cell";
-    if (v > 0) {
-      let income = Math.pow(3, v - 1) * incomeBoost;
-      div.innerHTML = `<div><b>Lv ${v}</b></div><div>${names[v - 1] || 'Tile ' + v}</div><div>${format(income)}/s</div>`;
-      div.style.background = `hsl(${(v * 37) % 360}, 70%, 50%)`;
-    }
-    grid.appendChild(div);
-  });
+E("themeSelect").value = state.theme;
+E("flashToggle").checked = state.flash;
+E("confirmToggle").checked = state.confirm;
+document.body.setAttribute("data-theme", state.theme);
 
-  let income = cells.reduce((sum, v) => sum + (v > 0 ? Math.pow(3, v - 1) : 0), 0) * incomeBoost;
-  document.getElementById("stats").innerText = `Coins: $${format(coins)} | Income: $${format(income)}/s | Multiplier: ${incomeBoost.toFixed(2)}x`;
-  document.getElementById("buyCost").innerText = `$${format(getTileCost())}`;
-  document.getElementById("mergeSpeed").innerText = autoMergeSpeed ? (autoMergeSpeed / 1000).toFixed(2) + "s" : "OFF";
-  document.getElementById("buySpeed").innerText = autoBuySpeed ? (autoBuySpeed / 1000).toFixed(2) + "s" : "OFF";
-  document.getElementById("mergeCost").innerText = format(1000 * Math.pow(2, autoMergeLevel));
-  document.getElementById("buyCost").innerText = format(750 * Math.pow(2, autoBuyLevel));
-  document.getElementById("multiBuyDisplay").innerText = "x" + multiBuy;
-  document.getElementById("boostCost").innerText = format(2000 * Math.pow(2, boostCount));
-  document.getElementById("incomeMultiplier").innerText = incomeBoost.toFixed(2) + "x";
-  document.getElementById("pp").innerText = prestigePoints;
-  document.getElementById("multiBuyPanel").style.background = multiBuyUnlocked ? "#113344" : "#222";
+function save() {
+  localStorage.setItem("qmSave", JSON.stringify(state));
 }
 
-function getTileCost() {
-  const count = levelBuys[buyLevel] || 0;
-  return Math.floor(10 * Math.pow(buyLevel, 2) * Math.pow(1.1, count));
+function setTheme(theme) {
+  state.theme = theme;
+  document.body.setAttribute("data-theme", theme);
+  save();
+}
+
+function getTileCost(lv = state.buyLevel) {
+  const bought = state.levelBuys[lv] || 0;
+  const baseIncome = Math.pow(2.5, lv); // base per-tile income
+  return Math.floor(baseIncome * 4 * Math.pow(1.1, bought));
+}
+
+function getHighestTile() {
+  return Math.max(...state.cells);
+}
+
+function updateBuyLevel() {
+  const highest = getHighestTile();
+  state.buyLevel = Math.max(1, highest - 4);
+}
+
+function getMultiBuyCost() {
+  switch (state.multiBuyState) {
+    case "x1": return "$500";
+    case "x5": return "$50K";
+    case "x10": return "$1M";
+    case "Half": return "Auto";
+    case "All": return "Auto";
+  }
+}
+
+function toggleMultiBuy() {
+  const next = {
+    "x1": { mode: "x5", cost: 500 },
+    "x5": { mode: "x10", cost: 5e4 },
+    "x10": { mode: "Half", cost: 1e6 },
+    "Half": { mode: "All", cost: 0 },
+    "All": { mode: "x1", cost: 0 }
+  };
+  const n = next[state.multiBuyState];
+  if (state.coins >= n.cost) {
+    state.coins -= n.cost;
+    state.multiBuyState = n.mode;
+    state.multiBuy = (n.mode === "Half" || n.mode === "All") ? n.mode : parseInt(n.mode.replace("x", ""));
+    render();
+  }
+}
+
+function render() {
+  updateBuyLevel();
+  const g = E("grid");
+  g.innerHTML = "";
+  let totalIncome = 0;
+  state.cells.forEach(v => {
+    const d = document.createElement("div");
+    d.className = "cell";
+    if (v > 0) {
+      const base = Math.pow(2.5, v);
+      totalIncome += base;
+      const boost = Math.pow(2, state.boostLevel);
+      d.innerHTML = `<div><b>Lv ${v}</b></div><div>Tile ${v}</div><div><b>${bigFormat(base)}</b>/s</div>`;
+      d.style.background = `hsl(${(v * 40) % 360},70%,50%)`;
+    }
+    g.appendChild(d);
+  });
+
+  const multiplier = Math.pow(2, state.boostLevel) * (1 + state.prestigeBonus);
+  const income = totalIncome * multiplier;
+  E("stats").innerText = `Coins: $${bigFormat(state.coins)} | Income: $${bigFormat(income)}/s | Boost: ${multiplier.toFixed(2)}x | Prestige: ${state.prestige}`;
+  E("buyCostText").innerText = "$" + bigFormat(getTileCost());
+  E("mergeSpeed").innerText = autoMergeSpeed ? (autoMergeSpeed / 1000).toFixed(5) + "s" : "OFF";
+  E("buySpeed").innerText = autoBuySpeed ? (autoBuySpeed / 1000).toFixed(5) + "s" : "OFF";
+  E("mergeCost").innerText = "$" + bigFormat(1000 * Math.pow(2, state.autoMergeLevel));
+  E("buyCost").innerText = "$" + bigFormat(750 * Math.pow(2, state.autoBuyLevel));
+  E("multiMode").innerText = state.multiBuyState;
+  E("multiCost").innerText = getMultiBuyCost();
+  E("boostLevel").innerText = multiplier.toFixed(2) + "x";
+  E("boostCost").innerText = "$" + bigFormat(2000 * Math.pow(2, state.boostLevel));
+  E("pp").innerText = state.prestigePoints;
+  save();
 }
 
 function buyTile() {
-  for (let i = 0; i < multiBuy; i++) {
-    let cost = getTileCost();
-    if (coins < cost) return;
-    const empty = cells.findIndex(v => v === 0);
-    if (empty === -1) return;
-    coins -= cost;
-    levelBuys[buyLevel] = (levelBuys[buyLevel] || 0) + 1;
-    buyCount++;
-    cells[empty] = buyLevel;
+  updateBuyLevel();
+  let amt = 1;
+  if (state.multiBuyState === "Half") amt = Math.floor(state.coins / (2 * getTileCost()));
+  if (state.multiBuyState === "All") amt = Math.floor(state.coins / getTileCost());
+  if (typeof state.multiBuy === "number") amt = state.multiBuy;
 
-    if ((levelBuys[buyLevel] || 0) % 5 === 0) {
-      applyAntiStuck(buyLevel);
+  for (let i = 0; i < amt; i++) {
+    const cost = getTileCost();
+    if (state.coins < cost) return;
+    const idx = state.cells.findIndex(v => v === 0);
+    if (idx === -1) return;
+    state.coins -= cost;
+    state.cells[idx] = state.buyLevel;
+    state.levelBuys[state.buyLevel] = (state.levelBuys[state.buyLevel] || 0) + 1;
+
+    if (state.levelBuys[state.buyLevel] % 5 === 0) {
+      state.cells = state.cells.map(v => (v < state.buyLevel && v > 0) ? 0 : v);
+      const ix = state.cells.findIndex(v => v === 0);
+      if (ix !== -1) state.cells[ix] = state.buyLevel;
     }
   }
   render();
 }
 
-function applyAntiStuck(level) {
-  const below = cells.filter(v => v > 0 && v < level);
-  if (below.length > 0) {
-    cells = cells.map(v => (v > 0 && v < level ? 0 : v));
-    const idx = cells.findIndex(v => v === 0);
-    if (idx !== -1) cells[idx] = level;
-  }
-}
-
 function mergeAll() {
-  for (let i = 0; i < cells.length; i++) {
-    for (let j = i + 1; j < cells.length; j++) {
-      if (cells[i] === cells[j] && cells[i] > 0) {
-        cells[i]++;
-        cells[j] = 0;
-        score += Math.pow(2, cells[i]);
-        if (cells[i] >= 50) {
-          prestigePoints += cells[i] - 49;
-          document.getElementById("prestigePanel").style.display = "block";
+  for (let i = 0; i < state.cells.length; i++) {
+    for (let j = i + 1; j < state.cells.length; j++) {
+      if (state.cells[i] === state.cells[j] && state.cells[i] > 0) {
+        state.cells[i]++;
+        state.cells[j] = 0;
+        if (state.cells[i] >= 50) {
+          E("prestigePanel").style.display = "block";
+          state.prestigePoints += state.cells[i] - 49;
         }
       }
     }
   }
-  cells.sort((a, b) => b - a);
-  render();
-}
-
-function earnCoins() {
-  coins += cells.reduce((sum, v) => sum + (v > 0 ? Math.pow(3, v - 1) : 0), 0) * incomeBoost;
+  state.cells.sort((a, b) => b - a);
   render();
 }
 
 function upgradeMerge() {
-  const cost = 1000 * Math.pow(2, autoMergeLevel);
-  if (coins < cost) return;
-  coins -= cost;
-  autoMergeLevel++;
-  autoMergeSpeed = Math.max(10, 15000 * Math.pow(0.5, autoMergeLevel));
-  if (autoMergeTimer) clearInterval(autoMergeTimer);
-  autoMergeTimer = setInterval(mergeAll, autoMergeSpeed);
+  const cost = 1000 * Math.pow(2, state.autoMergeLevel);
+  if (state.coins < cost || state.autoMergeLevel >= 24) return;
+  state.coins -= cost;
+  state.autoMergeLevel++;
+  autoMergeSpeed = Math.max(10, 15000 * Math.pow(0.5, state.autoMergeLevel));
+  clearInterval(autoMergeTimer);
+  autoMergeTimer = setInterval(() => {
+    if (state.autoMergeLevel > 0) mergeAll();
+  }, autoMergeSpeed);
   render();
 }
 
 function upgradeBuy() {
-  const cost = 750 * Math.pow(2, autoBuyLevel);
-  if (coins < cost) return;
-  coins -= cost;
-  autoBuyLevel++;
-  autoBuySpeed = Math.max(10, 10000 * Math.pow(0.5, autoBuyLevel));
-  if (autoBuyTimer) clearInterval(autoBuyTimer);
+  const cost = 750 * Math.pow(2, state.autoBuyLevel);
+  if (state.coins < cost || state.autoBuyLevel >= 24) return;
+  state.coins -= cost;
+  state.autoBuyLevel++;
+  autoBuySpeed = Math.max(10, 10000 * Math.pow(0.5, state.autoBuyLevel));
+  clearInterval(autoBuyTimer);
   autoBuyTimer = setInterval(buyTile, autoBuySpeed);
   render();
 }
 
-function unlockMultiBuy() {
-  if (!multiBuyUnlocked) {
-    if (coins < 500) return;
-    coins -= 500;
-    multiBuyUnlocked = true;
-    multiBuy = 1;
-  } else {
-    multiBuy = multiBuy === 1 ? 5 : multiBuy === 5 ? 10 : 1;
-  }
+function upgradeBoost() {
+  const cost = 2000 * Math.pow(2, state.boostLevel);
+  if (state.coins < cost) return;
+  state.coins -= cost;
+  state.boostLevel++;
   render();
 }
 
-function upgradeBoost() {
-  const cost = 2000 * Math.pow(2, boostCount);
-  if (coins < cost) return;
-  coins -= cost;
-  boostCount++;
-  incomeBoost *= 2;
-  render();
+function confirmPrestige() {
+  const hasTile50 = state.cells.some(v => v >= 50);
+  if (!hasTile50) return alert("You must unlock Tile 50 to prestige.");
+  if (state.confirm) {
+    actionQueue = "prestige";
+    E("confirmText").innerText = "Are you sure you want to prestige?";
+    E("confirmModal").style.display = "flex";
+  } else doPrestige();
 }
 
 function doPrestige() {
-  cells = Array(gridSize * gridSize).fill(0);
-  coins = 100;
-  score = 0;
-  levelBuys = {};
-  buyLevel = 1;
-  buyCount = 0;
-  autoMergeLevel = 0;
-  autoBuyLevel = 0;
-  incomeBoost = 1;
-  boostCount = 0;
-  multiBuyUnlocked = false;
-  multiBuy = 1;
-  if (autoMergeTimer) clearInterval(autoMergeTimer);
-  if (autoBuyTimer) clearInterval(autoBuyTimer);
+  state.cells = Array(25).fill(0);
+  state.coins = 100;
+  state.levelBuys = {};
+  state.buyLevel = 1;
+  state.autoBuyLevel = 0;
+  state.autoMergeLevel = 0;
+  state.boostLevel = 0;
+  state.multiBuy = 1;
+  state.multiBuyState = "x1";
+  state.prestige++;
+  state.prestigeBonus += 0.1;
   render();
 }
 
+function confirmReset() {
+  if (state.confirm) {
+    actionQueue = "reset";
+    E("confirmText").innerText = "Reset all progress?";
+    E("confirmModal").style.display = "flex";
+  } else doReset();
+}
+
+function doReset() {
+  localStorage.removeItem("qmSave");
+  location.reload();
+}
+
+function doConfirmedAction(yes) {
+  E("confirmModal").style.display = "none";
+  if (!yes) return;
+  if (actionQueue === "reset") doReset();
+  if (actionQueue === "prestige") doPrestige();
+  actionQueue = "";
+}
+
+E("flashToggle").onchange = e => { state.flash = e.target.checked; save(); };
+E("confirmToggle").onchange = e => { state.confirm = e.target.checked; save(); };
+
 document.addEventListener("keydown", e => {
-  if (e.code === "Space") mergeAll();
-  if (e.code === "KeyW") buyTile();
+  if (["KeyW","ArrowUp","Enter"].includes(e.code)) buyTile();
+  if (["KeyS","ArrowDown","Space"].includes(e.code)) mergeAll();
+  if (e.code === "Escape") E("helpModal").style.display = "none";
+  const n = parseInt(e.code.replace("Digit", ""));
+  if (n === 1) upgradeMerge();
+  if (n === 2) upgradeBuy();
+  if (n === 3) toggleMultiBuy();
+  if (n === 4) upgradeBoost();
+  if (n === 5) confirmPrestige();
 });
 
-setInterval(earnCoins, 1000);
-for (let i = 0; i < 4; i++) {
-  let idx = cells.findIndex(v => v === 0);
-  if (idx !== -1) cells[idx] = 1;
-}
-render();
+setInterval(() => {
+  const total = state.cells.reduce((sum, v) => sum + (v ? Math.pow(2.5, v) : 0), 0);
+  const mult = Math.pow(2, state.boostLevel) * (1 + state.prestigeBonus);
+  state.coins += total * mult;
+  render();
+}, 1000);
 
+for (let i = 0; i < 4; i++) state.cells[i] = 1;
+render();
 </script>
 </body>
 </html>
