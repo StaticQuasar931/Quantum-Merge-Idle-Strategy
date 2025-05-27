@@ -2,315 +2,340 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Quantum Merge – Idle Merge Strategy Game</title>
-  <meta name="description" content="Merge particles like Quark Nova and Higgs Core to create exponential energy and income. A school-safe, unblocked idle strategy game by StaticQuasar931.">
-  <meta name="keywords" content="quantum merge, idle merge game, exponential game, unblocked idle game, school merge game, staticquasar931 games, g@mes, merge strategy, clicker, incremental, idle g@me">
-  <link rel="canonical" href="https://sites.google.com/view/staticquasar931/gm3z/quantum-merge">
-
-  <!-- Preload Rotating Icons -->
-  <link rel="preload" as="image" href="https://res.cloudinary.com/dcsrqennd/image/upload/v1747533056/raw_um4pvq.png">
-  <link rel="preload" as="image" href="https://res.cloudinary.com/dcsrqennd/image/upload/v1747533158/raw_cw34yi.png">
-
+  <title>Quantum Merge Ultimate+++</title>
+  <meta name="description" content="Play Quantum Merge Ultimate+++: a satisfying, idle/active merge game with upgrades, automation, anti-stuck logic, and prestige. Chromebook optimized." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      background: radial-gradient(#111 0%, #000 100%);
-      font-family: 'Segoe UI', sans-serif;
+      background: #000;
       color: white;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
+      overflow-x: hidden;
     }
 
-    h1 { margin: 10px; font-size: 32px; }
+    h1 { font-size: 28px; margin: 8px 0; text-align: center; }
 
-    #score {
-      margin: 5px;
-      font-size: 16px;
+    #stats {
+      font-size: 14px;
+      margin: 4px;
+      text-align: center;
     }
 
     #grid {
       display: grid;
-      grid-template-columns: repeat(5, 90px);
-      grid-template-rows: repeat(5, 90px);
-      gap: 6px;
-      margin: 10px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      max-width: 480px;
+      width: 95vw;
+      margin: 6px;
     }
 
     .cell {
       background: #1f1f2e;
       color: white;
+      border-radius: 6px;
+      height: 70px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
-      font-size: 12px;
+      align-items: center;
       text-align: center;
-      border-radius: 10px;
-      cursor: pointer;
-      border: 2px solid #00f0ff66;
-      transition: transform 0.1s;
-      padding: 6px;
-      user-select: none;
+      border: 2px solid #00f0ff33;
+      font-size: 11px;
     }
 
-    .cell:hover { transform: scale(1.05); }
-    .highlight { border-color: #fff; }
+    .cell div {
+      max-width: 95%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
 
     button {
       background: #00f0ff;
       color: black;
-      padding: 8px 14px;
-      border: none;
-      border-radius: 8px;
       font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin: 4px;
       cursor: pointer;
-      margin: 6px 4px;
     }
 
-    #staticSlideMenu {
-      position: fixed;
-      bottom: 120px;
-      right: -150px;
-      width: 100px;
-      height: 100px;
-      z-index: 9999;
-      transition: right 1.2s ease-in-out;
+    .upgrade-box {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px auto;
+      max-width: 600px;
     }
 
-    #staticSlideMenu.show {
-      right: 20px;
+    .upgrade {
+      background: #222;
+      border: 1px solid #00f0ff;
+      border-radius: 6px;
+      padding: 6px;
+      min-width: 130px;
+      text-align: center;
+      font-size: 12px;
     }
 
-    #staticSlideMenu img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      animation: pulse 2.8s ease-in-out infinite;
-      border-radius: 50%;
+    .prestige {
+      background: #440044;
+      border: 2px solid #ff00ff;
+      color: #ffbbff;
+    }
+
+    .highlight {
+      animation: pulse 0.6s ease-in-out;
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    #staticMenu {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 12px 18px;
-      border-radius: 18px;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 0 12px #00ffea;
-      animation: flicker 2s infinite;
-    }
-
-    #closeStaticMenu {
-      margin-left: 10px;
-      background: red;
-      color: white;
-      border-radius: 8px;
-      padding: 2px 6px;
-      font-size: 10px;
-      cursor: pointer;
-    }
-
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+      0% { transform: scale(1); background-color: #0ff; color: black; }
+      50% { transform: scale(1.05); background-color: #2ff; }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
 <body>
-  <h1>Quantum Merge</h1>
-  <div id="score">Energy: 0 | Coins: 0</div>
+  <h1>Quantum Merge Ultimate+++</h1>
+  <div id="stats">Loading...</div>
   <div id="grid"></div>
+
   <div>
-    <button onclick="buyTile()">Buy Tile (W)</button>
+    <button onclick="buyTile()">Buy Tile (W) <span id="buyCost"></span></button>
     <button onclick="mergeAll()">Merge All (Space)</button>
-    <button onclick="resetGame()">Reset</button>
   </div>
 
-  <!-- Static Menu -->
-  <div id="staticMenu">
-    More Unblocked Games by Static
-    <span id="closeStaticMenu">✕</span>
+  <div class="upgrade-box" id="upgrades">
+    <div class="upgrade" id="autoMergePanel">
+      <b>Auto Merge</b><br>
+      Speed: <span id="mergeSpeed">OFF</span><br>
+      Cost: <span id="mergeCost">$1000</span><br>
+      <button onclick="upgradeMerge()">Upgrade</button>
+    </div>
+    <div class="upgrade" id="autoBuyPanel">
+      <b>Auto Buy</b><br>
+      Speed: <span id="buySpeed">OFF</span><br>
+      Cost: <span id="buyCost">$750</span><br>
+      <button onclick="upgradeBuy()">Upgrade</button>
+    </div>
+    <div class="upgrade" id="multiBuyPanel">
+      <b>Multi Buy</b><br>
+      Current: <span id="multiBuyDisplay">x1</span><br>
+      Cost: <span id="multiBuyCost">$500</span><br>
+      <button onclick="unlockMultiBuy()">Unlock / Toggle</button>
+    </div>
+    <div class="upgrade" id="incomeBoostPanel">
+      <b>Income Multiplier</b><br>
+      Current: <span id="incomeMultiplier">1.00x</span><br>
+      Cost: <span id="boostCost">$2000</span><br>
+      <button onclick="upgradeBoost()">Upgrade</button>
+    </div>
+    <div class="upgrade prestige" id="prestigePanel" style="display:none;">
+      <b>PRESTIGE</b><br>
+      Prestige Points: <span id="pp">0</span><br>
+      <button onclick="doPrestige()">Prestige Now</button>
+    </div>
   </div>
 
-  <!-- Slide Menu -->
-  <a id="staticSlideMenu" href="#" target="_blank">
-    <img src="" alt="Static Menu Icon">
-  </a>
+<script>
+window.onbeforeunload = function() {
+  return "Are you sure you want to leave? Your progress will be lost unless it's saved.";
+};
 
-  <script>
-    const gridSize = 5;
-    const quantumNames = [
-      'Quark Spark', 'Muon Echo', 'Boson Core', 'Boson Flux', 'Graviton Core',
-      'Quark Singularity', 'Photon Spark', 'Photon Nova', 'Photon Pulse', 'Higgs Echo',
-      'Neutrino Spark', 'Quark Flux', 'Quark Core', 'Photon Loop', 'Gluon Spark',
-      'Higgs Loop', 'Photon', 'Higgs Pulse', 'Muon Wave', 'Gluon',
-      'Tachyon Echo', 'Gluon Loop', 'Neutrino Nova', 'Boson Spark', 'Singularity Wave',
-      'Tachyon Core', 'Graviton Spark', 'Neutrino Echo', 'Photon Core', 'Quark Wave',
-      'Higgs Nova', 'Tachyon Singularity', 'Quantum Mind', 'Entropy Lock', 'Chaos Pulse',
-      'Time Core', 'Nova Brain', 'Echo Star', 'Gluon Burst', 'Darklight Node'
-    ];
+const format = n => {
+  if (n < 1e3) return n.toLocaleString();
+  const units = ["K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];
+  let u = Math.floor(Math.log10(n) / 3) - 1;
+  return (n / Math.pow(1e3, u + 1)).toFixed(2) + units[u];
+};
 
-    let cells = Array(gridSize * gridSize).fill(0);
-    let score = 0;
-    let coins = 0;
-    let selected = null;
-    let tick = 0;
+const names = (() => {
+  const bases = ["Quark", "Muon", "Boson", "Photon", "Neutrino", "Gluon", "Tachyon", "Higgs", "Graviton", "Lepton"];
+  const suffixes = ["Spark", "Echo", "Core", "Loop", "Nova", "Pulse", "Wave", "Singularity", "Matrix", "Drive"];
+  const list = [];
+  for (let i = 0; i < 15; i++) for (let j = 0; j < 10; j++) list.push(`${bases[j]} ${suffixes[i]}`);
+  return list;
+})();
 
-    const grid = document.getElementById('grid');
-    const scoreDisplay = document.getElementById('score');
+let gridSize = 5;
+let cells = Array(gridSize * gridSize).fill(0);
+let coins = 100;
+let score = 0;
+let tick = 0;
+let buyLevel = 1;
+let buyCount = 0;
+let levelBuys = {};
+let autoMergeSpeed = null, autoBuySpeed = null;
+let autoMergeLevel = 0, autoBuyLevel = 0;
+let autoMergeTimer = null, autoBuyTimer = null;
+let multiBuyUnlocked = false, multiBuy = 1;
+let incomeBoost = 1, boostCount = 0;
+let prestigePoints = 0;
 
-    function render() {
-      grid.innerHTML = '';
-      cells.forEach((val, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        if (val > 0) {
-          cell.textContent = quantumNames[val - 1] || `Q${val}`;
-          cell.style.background = `hsl(${(val * 45) % 360}, 70%, 50%)`;
-        }
-        if (selected === i) cell.classList.add('highlight');
-        cell.onclick = () => handleClick(i);
-        grid.appendChild(cell);
-      });
-      scoreDisplay.textContent = `Energy: ${score.toLocaleString()} | Coins: ${coins.toLocaleString()}`;
+function render() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  cells.forEach((v, i) => {
+    const div = document.createElement("div");
+    div.className = "cell";
+    if (v > 0) {
+      let income = Math.pow(3, v - 1) * incomeBoost;
+      div.innerHTML = `<div><b>Lv ${v}</b></div><div>${names[v - 1] || 'Tile ' + v}</div><div>${format(income)}/s</div>`;
+      div.style.background = `hsl(${(v * 37) % 360}, 70%, 50%)`;
     }
+    grid.appendChild(div);
+  });
 
-    function handleClick(i) {
-      if (selected === null && cells[i] > 0) {
-        selected = i;
-      } else if (selected === i) {
-        selected = null;
-      } else {
-        if (cells[i] === cells[selected] && cells[i] !== 0) {
-          cells[i]++;
-          score += Math.pow(2, cells[i]);
-          cells[selected] = 0;
-          selected = null;
-        } else {
-          selected = null;
+  let income = cells.reduce((sum, v) => sum + (v > 0 ? Math.pow(3, v - 1) : 0), 0) * incomeBoost;
+  document.getElementById("stats").innerText = `Coins: $${format(coins)} | Income: $${format(income)}/s | Multiplier: ${incomeBoost.toFixed(2)}x`;
+  document.getElementById("buyCost").innerText = `$${format(getTileCost())}`;
+  document.getElementById("mergeSpeed").innerText = autoMergeSpeed ? (autoMergeSpeed / 1000).toFixed(2) + "s" : "OFF";
+  document.getElementById("buySpeed").innerText = autoBuySpeed ? (autoBuySpeed / 1000).toFixed(2) + "s" : "OFF";
+  document.getElementById("mergeCost").innerText = format(1000 * Math.pow(2, autoMergeLevel));
+  document.getElementById("buyCost").innerText = format(750 * Math.pow(2, autoBuyLevel));
+  document.getElementById("multiBuyDisplay").innerText = "x" + multiBuy;
+  document.getElementById("boostCost").innerText = format(2000 * Math.pow(2, boostCount));
+  document.getElementById("incomeMultiplier").innerText = incomeBoost.toFixed(2) + "x";
+  document.getElementById("pp").innerText = prestigePoints;
+  document.getElementById("multiBuyPanel").style.background = multiBuyUnlocked ? "#113344" : "#222";
+}
+
+function getTileCost() {
+  const count = levelBuys[buyLevel] || 0;
+  return Math.floor(10 * Math.pow(buyLevel, 2) * Math.pow(1.1, count));
+}
+
+function buyTile() {
+  for (let i = 0; i < multiBuy; i++) {
+    let cost = getTileCost();
+    if (coins < cost) return;
+    const empty = cells.findIndex(v => v === 0);
+    if (empty === -1) return;
+    coins -= cost;
+    levelBuys[buyLevel] = (levelBuys[buyLevel] || 0) + 1;
+    buyCount++;
+    cells[empty] = buyLevel;
+
+    if ((levelBuys[buyLevel] || 0) % 5 === 0) {
+      applyAntiStuck(buyLevel);
+    }
+  }
+  render();
+}
+
+function applyAntiStuck(level) {
+  const below = cells.filter(v => v > 0 && v < level);
+  if (below.length > 0) {
+    cells = cells.map(v => (v > 0 && v < level ? 0 : v));
+    const idx = cells.findIndex(v => v === 0);
+    if (idx !== -1) cells[idx] = level;
+  }
+}
+
+function mergeAll() {
+  for (let i = 0; i < cells.length; i++) {
+    for (let j = i + 1; j < cells.length; j++) {
+      if (cells[i] === cells[j] && cells[i] > 0) {
+        cells[i]++;
+        cells[j] = 0;
+        score += Math.pow(2, cells[i]);
+        if (cells[i] >= 50) {
+          prestigePoints += cells[i] - 49;
+          document.getElementById("prestigePanel").style.display = "block";
         }
       }
-      render();
     }
+  }
+  cells.sort((a, b) => b - a);
+  render();
+}
 
-    function mergeAll() {
-      let merged = false;
-      for (let i = 0; i < cells.length; i++) {
-        for (let j = 0; j < cells.length; j++) {
-          if (i !== j && cells[i] === cells[j] && cells[i] > 0) {
-            cells[i]++;
-            score += Math.pow(2, cells[i]);
-            cells[j] = 0;
-            merged = true;
-            break;
-          }
-        }
-      }
-      if (merged) render();
-    }
+function earnCoins() {
+  coins += cells.reduce((sum, v) => sum + (v > 0 ? Math.pow(3, v - 1) : 0), 0) * incomeBoost;
+  render();
+}
 
-    function buyTile() {
-      const cost = Math.floor(10 * Math.pow(1.15, tick));
-      if (coins < cost) return;
-      const empty = cells.map((v, i) => v === 0 ? i : -1).filter(i => i !== -1);
-      if (empty.length === 0) return;
-      const idx = empty[Math.floor(Math.random() * empty.length)];
-      cells[idx] = 1;
-      coins -= cost;
-      tick++;
-      render();
-    }
+function upgradeMerge() {
+  const cost = 1000 * Math.pow(2, autoMergeLevel);
+  if (coins < cost) return;
+  coins -= cost;
+  autoMergeLevel++;
+  autoMergeSpeed = Math.max(10, 15000 * Math.pow(0.5, autoMergeLevel));
+  if (autoMergeTimer) clearInterval(autoMergeTimer);
+  autoMergeTimer = setInterval(mergeAll, autoMergeSpeed);
+  render();
+}
 
-    function incomeLoop() {
-      cells.forEach(val => {
-        if (val > 0) {
-          coins += Math.floor(Math.pow(3, val - 1));
-        }
-      });
-      render();
-      localStorage.setItem("qm_save", JSON.stringify({ cells, score, coins, tick }));
-    }
+function upgradeBuy() {
+  const cost = 750 * Math.pow(2, autoBuyLevel);
+  if (coins < cost) return;
+  coins -= cost;
+  autoBuyLevel++;
+  autoBuySpeed = Math.max(10, 10000 * Math.pow(0.5, autoBuyLevel));
+  if (autoBuyTimer) clearInterval(autoBuyTimer);
+  autoBuyTimer = setInterval(buyTile, autoBuySpeed);
+  render();
+}
 
-    function resetGame() {
-      if (!confirm("Are you sure you want to reset?")) return;
-      cells = Array(gridSize * gridSize).fill(0);
-      score = 0;
-      coins = 0;
-      tick = 0;
-      render();
-    }
+function unlockMultiBuy() {
+  if (!multiBuyUnlocked) {
+    if (coins < 500) return;
+    coins -= 500;
+    multiBuyUnlocked = true;
+    multiBuy = 1;
+  } else {
+    multiBuy = multiBuy === 1 ? 5 : multiBuy === 5 ? 10 : 1;
+  }
+  render();
+}
 
-    function loadGame() {
-      const save = JSON.parse(localStorage.getItem("qm_save") || "null");
-      if (save) {
-        cells = save.cells;
-        score = save.score;
-        coins = save.coins;
-        tick = save.tick || 0;
-      }
-      render();
-    }
+function upgradeBoost() {
+  const cost = 2000 * Math.pow(2, boostCount);
+  if (coins < cost) return;
+  coins -= cost;
+  boostCount++;
+  incomeBoost *= 2;
+  render();
+}
 
-    // Income every second
-    setInterval(incomeLoop, 1000);
+function doPrestige() {
+  cells = Array(gridSize * gridSize).fill(0);
+  coins = 100;
+  score = 0;
+  levelBuys = {};
+  buyLevel = 1;
+  buyCount = 0;
+  autoMergeLevel = 0;
+  autoBuyLevel = 0;
+  incomeBoost = 1;
+  boostCount = 0;
+  multiBuyUnlocked = false;
+  multiBuy = 1;
+  if (autoMergeTimer) clearInterval(autoMergeTimer);
+  if (autoBuyTimer) clearInterval(autoBuyTimer);
+  render();
+}
 
-    // Keyboard controls
-    document.addEventListener("keydown", e => {
-      if (e.code === "Space") mergeAll();
-      if (e.code === "KeyW") buyTile();
-    });
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") mergeAll();
+  if (e.code === "KeyW") buyTile();
+});
 
-    // Static Slide Menu Script
-    const menu = document.getElementById("staticMenu");
-    const closeBtn = document.getElementById("closeStaticMenu");
-    closeBtn.onclick = () => {
-      menu.style.display = "none";
-      setTimeout(() => {
-        menu.style.display = "block";
-      }, 180000);
-    };
+setInterval(earnCoins, 1000);
+for (let i = 0; i < 4; i++) {
+  let idx = cells.findIndex(v => v === 0);
+  if (idx !== -1) cells[idx] = 1;
+}
+render();
 
-    const slideMenu = document.getElementById("staticSlideMenu");
-    const formImg = "https://res.cloudinary.com/dcsrqennd/image/upload/v1747533056/raw_um4pvq.png";
-    const instaImg = "https://res.cloudinary.com/dcsrqennd/image/upload/v1747533158/raw_cw34yi.png";
-    const formLink = "https://sites.google.com/view/staticquasar931/google-form";
-    const instaLink = "https://www.instagram.com/freeschoolgamepage/";
-    let showForm = true;
-
-    function toggleSlide() {
-      if (showForm) {
-        slideMenu.href = formLink;
-        slideMenu.querySelector("img").src = formImg;
-        slideMenu.querySelector("img").alt = "Google Form";
-      } else {
-        slideMenu.href = instaLink;
-        slideMenu.querySelector("img").src = instaImg;
-        slideMenu.querySelector("img").alt = "Instagram";
-      }
-      showForm = !showForm;
-      slideMenu.classList.add("show");
-      setTimeout(() => {
-        slideMenu.classList.remove("show");
-      }, 10000);
-    }
-
-    toggleSlide();
-    setInterval(toggleSlide, 25000);
-
-    loadGame();
-  </script>
+</script>
 </body>
 </html>
